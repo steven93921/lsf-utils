@@ -68,6 +68,11 @@ To submit jobs as another user, run the following command:
 
     $ bsubmit --user apappas sleep 10
 
+It may be necessary to escape quotes or other special characters when submitting jobs with bsub options that use single or double quotes.  For example:
+
+    $ bsubmit --user apappas -Ep \"sleep 5\" -w 'done\(102\)' sleep 10
+
+
 ## Release notes
 
 ### Release 1.0
