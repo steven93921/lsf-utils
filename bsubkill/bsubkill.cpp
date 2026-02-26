@@ -292,16 +292,17 @@ bool verifyUserMapping(std::string fpath, std::string execName)
 
 int runcmd(std::string cmd, std::ostream &os)
 {
-    int retVal = -1;
     FILE * fp = popen(cmd.c_str(), "r");
     if (fp != NULL) {
         char buffer[4096];
         while(fgets(buffer, sizeof(buffer) - 1, fp) != NULL) {
             os << buffer;
         }
-        retVal = pclose(fp);
+        int status = pclose(fp);
+        return WEXITSTATUS(status);
+    } else {
+        throw std::runtime_error("popen() failed!");
     }
-    return retVal;
 }
 
 int runcmd(std::string cmd)
