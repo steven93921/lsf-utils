@@ -312,17 +312,22 @@ int runcmd(std::string cmd)
 
 int changeUser(const char * execUser)
 {
-    if (geteuid() != 0) {
-        std::cout << "This program must be run with root privileges." << std::endl;
-        return -1;
-    }
-
+    // Are we already the user attempting to kill the job? If so, just return.
     struct passwd * execpsw = getpwnam(execUser);
     if (execpsw == NULL) {
         std::cout << "The user name " << execUser << " is not valid." << std::endl;
         return -1;
     }
     uid_t execuid = execpsw->pw_uid;
+
+    if (getuid() == execuid) {
+        return 0;
+    }
+
+    if (geteuid() != 0) {
+        std::cout << "This program must be run with root privileges." << std::endl;
+        return -1;
+    }
 
     std::string clustername = getClusterName();
     if (clustername.empty()) {
@@ -382,6 +387,7 @@ int main(int argc, char **argv)
         std::string user = trim(oss.str());
 
         if (user.length() == 0) {
+            std::cout << "Something went wrong. There's no error but the user for Job <" << argv[1] << "> cannot be determined." << std::endl;
             return -1;
         }
 
